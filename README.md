@@ -1,5 +1,5 @@
 # SpotifyFollowBot
- Follow or Unfullow users with multiple accounts
+ Follow or Unfollow users with multiple accounts
 # Tool
 ![](https://i.ibb.co/P6xNkfK/tool.png)
 
