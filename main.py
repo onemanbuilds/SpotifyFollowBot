@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from time import sleep
 from random import randint
 from concurrent.futures import ThreadPoolExecutor
+from colorama import init,Fore
 import os
 
 class Main:
@@ -21,11 +22,21 @@ class Main:
     def __init__(self):
         self.clear()
         self.SetTitle('One Man Builds Spotify FollowBot Selenium')
-        self.follow_option = int(input('[QUESTION] [1]Follow [0]Unfollow: '))
-        self.browser_amount = int(input('[QUESTION] How many browser would you like to run at the same time: '))
-        self.url = str(input('[QUESTION] Enter the profile url: '))
-        self.headless = int(input('[QUESTION] Would you like to use headless mode [1]yes [0]no: '))
-        self.waiting_time = int(input('[QUESTION] How many seconds would you like to wait between follows: '))
+        init(convert=True)
+        title = Fore.YELLOW+"""
+                                    
+                            ____ ___  ____ ___ _ ____ _   _    ____ ____ _    _    ____ _ _ _ 
+                            [__  |__] |  |  |  | |___  \_/     |___ |  | |    |    |  | | | | 
+                            ___] |    |__|  |  | |      |      |    |__| |___ |___ |__| |_|_| 
+                                                                                            
+                                    
+        """
+        print(title)
+        self.follow_option = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] [1]Follow [0]Unfollow: '))
+        self.browser_amount = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many browser would you like to run at the same time: '))
+        self.url = str(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Enter the profile url: '))
+        self.headless = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Would you like to use headless mode [1]yes [0]no: '))
+        self.waiting_time = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many seconds would you like to wait between follows: '))
         print('')
 
     def ReadFile(self,filename,method):
@@ -45,8 +56,10 @@ class Main:
         sleep(1)
 
         if driver.current_url == 'https://accounts.spotify.com/en/status':
+            print(Fore.GREEN+'['+Fore.WHITE+'!'+Fore.GREEN+'] LOGGED IN WITH | {0}:{1}'.format(username,password))
             logged_in = True
         else:
+            print(Fore.RED+'['+Fore.WHITE+'-'+Fore.RED+'] FAILED TO LOGIN WITH | {0}:{1}'.format(username,password))
             logged_in = False
 
         return logged_in
@@ -56,15 +69,15 @@ class Main:
             button_values = driver.execute_script("return document.getElementsByClassName('ff6a86a966a265b5a51cf8e30c6c52f4-scss');")
             if button_values[0].text.lower() == 'follow':
                 driver.execute_script("document.getElementsByClassName('ff6a86a966a265b5a51cf8e30c6c52f4-scss')[0].click();")
-                print('FOLLOWED WITH {0}'.format(combos))
+                print(Fore.GREEN+'['+Fore.WHITE+'!'+Fore.GREEN+'] FOLLOWED WITH | {0}'.format(combos))
                 with open('followed.txt','a',encoding='utf8') as f:
-                    f.write('FOLLOWED WITH {0}\n'.format(combos))
+                    f.write('FOLLOWED WITH | {0}\n'.format(combos))
             elif button_values[0].text.lower() == 'following':
-                print('ALREADY FOLLOWING WITH {0}'.format(combos))
+                print(Fore.RED+'['+Fore.WHITE+'-'+Fore.RED+'] ALREADY FOLLOWING WITH | {0}'.format(combos))
                 with open('already_following.txt','a',encoding='utf8') as f:
-                    f.write('ALREADY FOLLOWING WITH {0}\n'.format(combos))
+                    f.write('ALREADY FOLLOWING WITH | {0}\n'.format(combos))
             else:
-                print('SOMETHING WENT WRONG')
+                print(Fore.RED+'['+Fore.WHITE+'-'+Fore.RED+'] SOMETHING WENT WRONG')
         except:
             self.ClickFollowButton(driver,combos)
 
@@ -73,15 +86,15 @@ class Main:
             button_values = driver.execute_script("return document.getElementsByClassName('ff6a86a966a265b5a51cf8e30c6c52f4-scss');")
             if button_values[0].text.lower() == 'following':
                 driver.execute_script("document.getElementsByClassName('ff6a86a966a265b5a51cf8e30c6c52f4-scss')[0].click();")
-                print('UNFOLLOWED WITH {0}'.format(combos))
+                print(Fore.GREEN+'['+Fore.WHITE+'!'+Fore.GREEN+'] UNFOLLOWED WITH | {0}'.format(combos))
                 with open('unfollowed.txt','a',encoding='utf8') as f:
-                    f.write('UNFOLLOWED WITH {0}\n'.format(combos))
+                    f.write('UNFOLLOWED WITH | {0}\n'.format(combos))
             elif button_values[0].text.lower() == 'follow':
-                print('NOT FOLLOWING WITH {0}'.format(combos))
+                print(Fore.RED+'['+Fore.WHITE+'-'+Fore.RED+'] NOT FOLLOWING WITH | {0}'.format(combos))
                 with open('not_following.txt','a',encoding='utf8') as f:
-                    f.write('NOT FOLLOWING WITH {0}\n'.format(combos))
+                    f.write('NOT FOLLOWING WITH | {0}\n'.format(combos))
             else:
-                print('SOMETHING WENT WRONG')
+                print(Fore.RED+'['+Fore.WHITE+'-'+Fore.RED+'] SOMETHING WENT WRONG')
         except:
             self.ClickFollowButton()
 
