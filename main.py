@@ -35,7 +35,7 @@ class Main:
         self.follow_option = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] [1]Follow [0]Unfollow: '))
         self.browser_amount = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many browser would you like to run at the same time: '))
         self.headless = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Would you like to use headless mode [1]yes [0]no: '))
-        self.waiting_time = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many seconds would you like to wait between follows: '))
+        self.waiting_time = float(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many seconds would you like to wait between follows: '))
         self.url = str(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Enter the profile url: '))
         print('')
 
