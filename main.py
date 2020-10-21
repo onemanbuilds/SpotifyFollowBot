@@ -34,9 +34,9 @@ class Main:
         print(title)
         self.follow_option = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] [1]Follow [0]Unfollow: '))
         self.browser_amount = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many browser would you like to run at the same time: '))
-        self.url = str(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Enter the profile url: '))
         self.headless = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Would you like to use headless mode [1]yes [0]no: '))
         self.waiting_time = int(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] How many seconds would you like to wait between follows: '))
+        self.url = str(input(Fore.YELLOW+'['+Fore.WHITE+'>'+Fore.YELLOW+'] Enter the profile url: '))
         print('')
 
     def ReadFile(self,filename,method):
@@ -96,32 +96,34 @@ class Main:
             else:
                 print(Fore.RED+'['+Fore.WHITE+'-'+Fore.RED+'] SOMETHING WENT WRONG')
         except:
-            self.ClickFollowButton()
+            self.ClickFollowingButton(driver,combos)
 
     def Follow(self,combos):
-        username = combos.split(':')[0].replace("['","")
-        password = combos.split(':')[-1].replace("]'","")
-        options = Options()
+        try:
+            username = combos.split(':')[0].replace("['","")
+            password = combos.split(':')[-1].replace("]'","")
+            options = Options()
 
-        if self.headless == 1:
-            options.add_argument('--headless')
-        
-        options.add_argument('no-sandbox')
-        options.add_argument('--log-level=3')
-        options.add_experimental_option('excludeSwitches', ['enable-logging','enable-automation'])
-        driver = webdriver.Chrome(options=options)
-
-        if self.Login(username,password,driver) == True:
-            driver.get(self.url)
-            sleep(self.waiting_time)
-            if self.follow_option == 1:
-                self.ClickFollowButton(driver,combos)
-            else:
-                self.ClickFollowingButton(driver,combos)
-            sleep(self.waiting_time)
+            if self.headless == 1:
+                options.add_argument('--headless')
             
-        driver.close()
-        driver.quit()
+            options.add_argument('no-sandbox')
+            options.add_argument('--log-level=3')
+            options.add_experimental_option('excludeSwitches', ['enable-logging','enable-automation'])
+            driver = webdriver.Chrome(options=options)
+
+            if self.Login(username,password,driver) == True:
+                driver.get(self.url)
+                sleep(self.waiting_time)
+                if self.follow_option == 1:
+                    self.ClickFollowButton(driver,combos)
+                else:
+                    self.ClickFollowingButton(driver,combos)
+                sleep(self.waiting_time)
+        except:
+            self.Follow(combos)
+        finally:
+            driver.quit()
 
     def Start(self):
         combos = self.ReadFile('combos.txt','r')
