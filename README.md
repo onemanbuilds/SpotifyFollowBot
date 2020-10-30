@@ -1,10 +1,10 @@
 # SpotifyFollowBot
  Follow or Unfollow users with multiple accounts
 # Tool
-![](https://i.ibb.co/P6xNkfK/tool.png)
+![](https://i.ibb.co/209gHG4/spotify-follow-tool-v2.png)
 
 # Example
-![](https://i.ibb.co/g4bZ0ky/example.png)
+![](https://i.ibb.co/XXsLgmN/spotify-follow-tool-v2-example.png)
 
 # Legal
  This was merely a speedrun to demonstrate how follow bots work.<br/>
