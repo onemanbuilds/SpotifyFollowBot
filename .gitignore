@@ -125,3 +125,4 @@ dmypy.json
 .pyre/
 output/main.exe
 output/SpotifyFollowBot.exe
+SpotifyFollowBot.zip
