@@ -126,3 +126,8 @@ dmypy.json
 output/main.exe
 output/SpotifyFollowBot.exe
 SpotifyFollowBot.zip
+SpotifyFollowBot/chromedriver.exe
+SpotifyFollowBot/combos.txt
+SpotifyFollowBot/proxies.txt
+SpotifyFollowBot/SpotifyFollowBot.exe
+SpotifyFollowBot/useragents.txt

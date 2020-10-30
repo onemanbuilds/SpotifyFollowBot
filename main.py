@@ -10,6 +10,7 @@ from colorama import init,Fore,Style
 from os import name,system
 from sys import stdout
 from concurrent.futures import ThreadPoolExecutor
+from time import sleep
 
 class Main:
     def clear(self):
@@ -107,6 +108,7 @@ class Main:
            
                 if follow_button.text == "FOLLOW":
                     follow_button.click()
+                    sleep(1)
                     self.PrintText(Fore.CYAN,Fore.RED,'FOLLOWED',f'{username}:{password}')
                 elif follow_button.text == "FOLLOWING":
                     self.PrintText(Fore.RED,Fore.CYAN,'FOLLOWING',f'{username}:{password}')
@@ -123,8 +125,8 @@ class Main:
         try:
             options = Options()
 
-            if self.headless == 1:
-                options.add_argument('--headless')
+            #if self.headless == 1:
+            #    options.add_argument('--headless')
 
             options.add_argument(f'--user-agent={self.GetRandomUserAgent()}')
             options.add_argument('no-sandbox')
@@ -154,6 +156,7 @@ class Main:
 
                 if follow_button.text == "FOLLOWING":
                     follow_button.click()
+                    sleep(1)
                     self.PrintText(Fore.CYAN,Fore.RED,'UNFOLLOWED',f'{username}:{password}')
                 elif follow_button.text == "FOLLOW":
                     self.PrintText(Fore.RED,Fore.CYAN,'NOT FOLLOWING',f'{username}:{password}')
