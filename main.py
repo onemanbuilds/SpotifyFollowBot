@@ -83,6 +83,7 @@ class Main:
             #options.add_argument(f'--user-agent={self.GetRandomUserAgent()}')
             options.add_argument('no-sandbox')
             options.add_argument('--log-level=3')
+            options.add_argument('--lang=en')
 
             if self.use_proxy == 1:
                 options.add_argument('--proxy-server=http://{0}'.format(self.GetRandomProxy()))
@@ -131,6 +132,7 @@ class Main:
             options.add_argument(f'--user-agent={self.GetRandomUserAgent()}')
             options.add_argument('no-sandbox')
             options.add_argument('--log-level=3')
+            options.add_argument('--lang=en')
 
             if self.use_proxy == 1:
                 options.add_argument('--proxy-server=http://{0}'.format(self.GetRandomProxy()))
