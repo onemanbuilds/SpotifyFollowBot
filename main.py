@@ -71,7 +71,7 @@ class Main:
             return logged_in
         except:
             driver.quit()
-            self.Login(username,password)
+            self.Login(username,password,driver)
 
     def Follow(self,username,password):
         try:
