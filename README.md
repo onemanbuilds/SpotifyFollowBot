@@ -1,5 +1,11 @@
 # SpotifyFollowBot
  Follow or Unfollow users with multiple accounts
+
+# Installation
+```
+pip3 install -r requirements.txt
+``` 
+
 # Tool
 ![](https://i.ibb.co/209gHG4/spotify-follow-tool-v2.png)
 
