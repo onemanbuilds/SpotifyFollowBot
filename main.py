@@ -3,8 +3,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-from threading import Lock
+from threading import Thread,Lock
 from random import choice
 from colorama import init,Fore,Style
 from os import name,system
@@ -23,6 +24,11 @@ class Main:
 
     def SetTitle(self,title_name:str):
         system("title {0}".format(title_name))
+
+    def TitleUpdate(self):
+        while True:
+            self.SetTitle('One Man Builds Follow Bot Selenium ^| FOLLOWED / UNFOLLOWED: {0} ^| ALREADY FOLLOWED / UNFOLLOWED: {1} ^| RETRIES: {2}'.format(self.success,self.already,self.retries))
+            sleep(0.1)
 
     def GetRandomUserAgent(self):
         useragents = self.ReadFile('useragents.txt','r')
@@ -49,22 +55,19 @@ class Main:
             logged_in = False
 
             driver.get('https://accounts.spotify.com/en/login/')
-            element_present = EC.presence_of_element_located((By.ID, 'login-username'))
-            WebDriverWait(driver, 20).until(element_present)
-            username_elem = driver.find_element_by_id('login-username')
-            username_elem.send_keys(username)
-            password_elem = driver.find_element_by_id('login-password')
-            password_elem.send_keys(password)
-            login_button_elem = driver.find_element_by_id('login-button')
-            login_button_elem.click()
+            login_username_present = EC.presence_of_element_located((By.ID, 'login-username'))
+            WebDriverWait(driver, self.website_load_max_wait).until(login_username_present)
 
-            element_present = EC.url_matches('https://accounts.spotify.com/en/status')
-            WebDriverWait(driver, 20).until(element_present)
-            
-            if driver.current_url == 'https://accounts.spotify.com/en/status':
+            username_elem = driver.find_element_by_id('login-username').send_keys(username)
+            password_elem = driver.find_element_by_id('login-password').send_keys(password)
+            login_button_elem = driver.find_element_by_id('login-button').click()
+
+            try:
+                url_to_be_present = EC.url_to_be('https://accounts.spotify.com/en/status')
+                WebDriverWait(driver, self.login_check_max_wait).until(url_to_be_present)
                 self.PrintText(Fore.CYAN,Fore.RED,'LOGIN',f'LOGGED IN WITH | {username}:{password}')
                 logged_in = True
-            else:
+            except TimeoutException:
                 self.PrintText(Fore.RED,Fore.CYAN,'LOGIN',f'FAILED TO LOGIN WITH | {username}:{password}')
                 logged_in = False
         
@@ -72,6 +75,8 @@ class Main:
         except:
             driver.quit()
             self.Login(username,password,driver)
+        #finally:
+        #    driver.quit()
 
     def Follow(self,username,password):
         try:
@@ -102,21 +107,24 @@ class Main:
 
             if self.Login(username,password,driver) == True:
                 driver.get(self.url)
-                element_present = EC.presence_of_element_located((By.XPATH, '/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button'))
-                WebDriverWait(driver, 20).until(element_present)
-
-                follow_button = driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button')
-           
-                if follow_button.text == "FOLLOW":
-                    follow_button.click()
-                    sleep(1)
-                    self.PrintText(Fore.CYAN,Fore.RED,'FOLLOWED',f'{username}:{password}')
-                elif follow_button.text == "FOLLOWING":
-                    self.PrintText(Fore.RED,Fore.CYAN,'FOLLOWING',f'{username}:{password}')
-                else:
-                    self.PrintText(Fore.RED,Fore.CYAN,'ERROR','SOMETHING WENT WRONG WITH THE FOLLOWING')
+                try:
+                    follow_button_clickable = EC.element_to_be_clickable((By.XPATH, '/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button[1]'))
+                    WebDriverWait(driver, self.max_wait).until(follow_button_clickable)
+                    follow_button_element = driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button[1]')
+                    if follow_button_element.text == 'FOLLOW':
+                        follow_button_element.click()
+                        if self.wait_after_follow_unfollow_click > 0:
+                            sleep(self.wait_after_follow_unfollow_click)
+                        self.PrintText(Fore.CYAN,Fore.RED,'FOLLOWED',f'{username}:{password}')
+                        self.success += 1
+                    else:
+                        self.PrintText(Fore.CYAN,Fore.RED,'FOLLOWING',f'{username}:{password}')
+                        self.already += 1
+                except TimeoutException:
+                    self.PrintText(Fore.RED,Fore.CYAN,'ERROR','FOLLOW BUTTON NOT CLICKABLE')
         except:
             driver.quit()
+            self.retries += 1
             self.Follow(username,password)
         finally:
             driver.quit()
@@ -151,21 +159,24 @@ class Main:
 
             if self.Login(username,password,driver) == True:
                 driver.get(self.url)
-                element_present = EC.presence_of_element_located((By.XPATH, '/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button'))
-                WebDriverWait(driver, 20).until(element_present)
-                
-                follow_button = driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button')
-
-                if follow_button.text == "FOLLOWING":
-                    follow_button.click()
-                    sleep(1)
-                    self.PrintText(Fore.CYAN,Fore.RED,'UNFOLLOWED',f'{username}:{password}')
-                elif follow_button.text == "FOLLOW":
-                    self.PrintText(Fore.RED,Fore.CYAN,'NOT FOLLOWING',f'{username}:{password}')
-                else:
-                    self.PrintText(Fore.RED,Fore.CYAN,'ERROR','SOMETHING WENT WRONG WITH THE FOLLOWING')
+                try:
+                    follow_button_clickable = EC.element_to_be_clickable((By.XPATH, '/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button[1]'))
+                    WebDriverWait(driver, self.max_wait).until(follow_button_clickable)
+                    follow_button_element = driver.find_element_by_xpath('/html/body/div[4]/div/div[2]/div[4]/main/div/div[2]/div/div/div[2]/section/div/div[3]/div/button[1]')
+                    if follow_button_element.text == 'FOLLOWING':
+                        follow_button_element.click()
+                        if self.wait_after_follow_unfollow_click > 0:
+                            sleep(self.wait_after_follow_unfollow_click)
+                        self.PrintText(Fore.CYAN,Fore.RED,'UNFOLLOWED',f'{username}:{password}')
+                        self.success += 1
+                    else:
+                        self.PrintText(Fore.CYAN,Fore.RED,'NOT FOLLOWING',f'{username}:{password}')
+                        self.already += 1
+                except TimeoutException:
+                    self.PrintText(Fore.RED,Fore.CYAN,'ERROR','UNFOLLOW BUTTON NOT CLICKABLE')
         except:
             driver.quit()
+            self.retries += 1
             self.UnFollow(username,password)
         finally:
             driver.quit()
@@ -174,48 +185,52 @@ class Main:
     def __init__(self):
         init(convert=True)
         self.lock = Lock()
+
+        self.success = 0
+        self.already = 0
+        self.retries = 0
+
         self.clear()
-        self.SetTitle('One Man Builds Spotify Follow Tool Selenium')
+        self.SetTitle('One Man Builds Spotify Follow Bot Selenium')
         self.title = Style.BRIGHT+Fore.RED+"""
-                                         ___________ _____ _____ _____________   __
-                                        /  ___| ___ \  _  |_   _|_   _|  ___\ \ / /
-                                        \ `--.| |_/ / | | | | |   | | | |_   \ V / 
-                                         `--. \  __/| | | | | |   | | |  _|   \ /  
-                                        /\__/ / |   \ \_/ / | |  _| |_| |     | |  
-                                        \____/\_|    \___/  \_/  \___/\_|     \_/  
-                                                                                
-                                                                                
-                                         ______ _____ _      _     _____  _    _    
-                                         |  ___|  _  | |    | |   |  _  || |  | |   
-                                         | |_  | | | | |    | |   | | | || |  | |   
-                                         |  _| | | | | |    | |   | | | || |/\| |   
-                                         | |   \ \_/ / |____| |___\ \_/ /\  /\  /   
-                                         \_|    \___/\_____/\_____/\___/  \/  \/    
-                                           
+                                  ╔══════════════════════════════════════════════════╗
+                                    ╔═╗╔═╗╔═╗╔╦╗╦╔═╗╦ ╦  ╔═╗╔═╗╦  ╦  ╔═╗╦ ╦╔╗ ╔═╗╔╦╗
+                                    ╚═╗╠═╝║ ║ ║ ║╠╣ ╚╦╝  ╠╣ ║ ║║  ║  ║ ║║║║╠╩╗║ ║ ║ 
+                                    ╚═╝╩  ╚═╝ ╩ ╩╚   ╩   ╚  ╚═╝╩═╝╩═╝╚═╝╚╩╝╚═╝╚═╝ ╩ 
+                                  ╚══════════════════════════════════════════════════╝         
+                                          
                                                                                      
         """
         print(self.title)
         self.method = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] ['+Fore.RED+'1'+Fore.CYAN+']Follow ['+Fore.RED+'0'+Fore.CYAN+']Unfollow: '))
         self.use_proxy = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] ['+Fore.RED+'1'+Fore.CYAN+']Proxy ['+Fore.RED+'0'+Fore.CYAN+']Proxyless: '))
-        #self.headless = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] ['+Fore.RED+'1'+Fore.CYAN+']Headless ['+Fore.RED+'0'+Fore.CYAN+']Not Headless: '))
-        self.browser_amount = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Browser amount: '))
+        self.browser_amount = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Threads: '))
+        self.max_wait = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Max Wait For Url To Load (seconds): '))
+        self.website_load_max_wait = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Website Load Max Wait (seconds): '))
+        self.login_check_max_wait = int(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Login Check Max Wait (seconds): '))
+        self.wait_after_follow_unfollow_click = float(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Wait After Follow / Unfollow Button Click: '))
+        self.wait_before_start = float(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Wait Before Start (seconds): '))
         self.url = str(input(Style.BRIGHT+Fore.CYAN+'['+Fore.RED+'>'+Fore.CYAN+'] Profile url: '))
         print('')
 
     def Start(self):
+        Thread(target=self.TitleUpdate).start()
         combos = self.ReadFile('combos.txt','r')
         with ThreadPoolExecutor(max_workers=self.browser_amount) as ex:
             if self.method == 1:
                 for combo in combos:
                     username = combo.split(':')[0]
                     password = combo.split(':')[-1]
-
                     ex.submit(self.Follow,username,password)
+                    if self.wait_before_start > 0:
+                        sleep(self.wait_before_start)
             else:
                 for combo in combos:
                     username = combo.split(':')[0]
                     password = combo.split(':')[-1]
                     ex.submit(self.UnFollow,username,password)
+                    if self.wait_before_start > 0:
+                        sleep(self.wait_before_start)
 
 if __name__ == "__main__":
     main = Main()
