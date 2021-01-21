@@ -1,0 +1,13 @@
+{
+    "use_proxy":0,
+    "proxy_type":2,
+    "method":1,
+    "headless":0,
+    "website_load_max_wait":20,
+    "login_check_max_wait":20,
+    "button_click_max_wait":20,
+    "wait_after_follow_unfollow_click":1,
+    "wait_before_start":1,
+    "browser_amount":1,
+    "url":"urltofollowhere"
+}
