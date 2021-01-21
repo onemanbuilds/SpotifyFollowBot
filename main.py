@@ -170,7 +170,7 @@ class Main:
             if self.Login(email,password,driver) == True:
                 driver.get(self.url)
                 try:
-                    WebDriverWait(driver,self.login_check_max_wait).until(EC.element_to_be_clickable((By.CSS_SELECTOR,'#onetrust-accept-btn-handler'))).click()
+                    WebDriverWait(driver,self.button_click_max_wait).until(EC.element_to_be_clickable((By.CSS_SELECTOR,'#onetrust-accept-btn-handler'))).click()
                     self.PrintText(Fore.WHITE,Fore.GREEN,'COOKIES','ACCEPTED')
                     if self.method == 1:
                         try:
